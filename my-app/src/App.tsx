@@ -1,6 +1,12 @@
 import './index.css';
-import { useEffect, useState } from 'react';
+import { ButtonOp } from './components/Buttons/ButtonOp';
 
 export const App = () => {
-  return <></>;
+  return (
+    <>
+      <div className='min-h-screen w-full @apply bg-swiss-black text-white font-sans'>
+        <ButtonOp onClick={() => {}} text='JS' id='buttonJS' />
+      </div>
+    </>
+  );
 };
