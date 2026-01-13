@@ -2,7 +2,7 @@
 // Base interface for button components
 //========================================//
 export interface baseButton {
-  text: string;
+  text?: string;
   id: string;
   image?: string;
 }
