@@ -1,19 +1,20 @@
 import { useGSAP } from '@gsap/react';
-import { useRef, useState } from 'react';
-import gsap from 'gsap';
+import { useRef } from 'react';
+import { LENGUAJE_STYLES, LenguajeTipo } from '../Buttons/ButtonOp';
 
 export interface OverlayContent {
   id: string;
   title: string;
   description: string;
+  buttonText: string;
+  lenguaje: LenguajeTipo;
   media?: {
-    type: 'image' | 'gif' | 'video';
+    type: 'image';
     src: string;
   };
 }
 export interface OverlayAction {
   label: string;
-  variant?: 'primary' | 'secondary' | 'danger';
   onClick: (id: string) => void;
 }
 
@@ -21,7 +22,6 @@ export interface OverlayProps {
   isOpen: boolean;
   content: OverlayContent | null;
   actions: OverlayAction[];
-  backgroundColor?: string;
   onClose: () => void;
 }
 
@@ -29,29 +29,71 @@ export const Overlay = ({
   isOpen,
   content,
   actions,
-  backgroundColor,
   onClose,
 }: OverlayProps) => {
+  const RefBase = useRef<HTMLDivElement>(null);
+  
+  const tl = useRef<gsap.core.Timeline>(null);
+  const { contextSafe } = useGSAP({ scope: 'overlay-actions' });
+
+
+  
+  if (!isOpen || !content) return null;
+  const style = LENGUAJE_STYLES[content.lenguaje];
   return (
     <div
-      id='overlay-base'
-      className='fixed inset-0 z-50 overflow-hidden bg-black flex items-center justify-center'
+      ref={RefBase}
+      className='fixed inset-0 z-50 overflow-hidden bg-black flex items-center justify-center p-4'
     >
       <div
         id='overlay-container'
-        className='relative w-full h-full max-w-7xl p-10 grid grid-cols-12 grid-rows-6'
+        /* @container para que hijos reaccionen a este ancho */
+        className='@container relative w-full h-full max-w-7xl p-6 md:p-10 grid grid-cols-12 grid-rows-6 border border-white/10 bg-black'
       >
         <div
           id='overlay-actions'
-          className='col-span-3 row-span-6 flex flex-col gap-4 border-r border-white/20'
+          /* Si el contenedor es pequeño (móvil), ocupa 12 cols arriba. Si es grande (@lg), 3 cols a la izquierda */
+          className='col-span-12 row-span-1 @lg:col-span-3 @lg:row-span-6 flex @lg:flex-col gap-4 border-b @lg:border-b-0 @lg:border-r border-white/20 pb-6 @lg:pb-0 @lg:pr-10'
         >
-          <button id='action-btn'></button>
-          <button id='action-btn'></button>
+          {actions.map((action, index) => (
+            <button
+              key={index}
+              className='action-btn text-left text-sm font-mono uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity'
+              onClick={() => action.onClick(content.id)}
+            >
+              {action.label}
+            </button>
+          ))}
         </div>
-        <main className='overlay-content col-span-9 row-span-6 p-12 flex flex-col justify-center'>
-          {/* Aquí iría tu title, description, etc. */}
+
+        {/* Agregamos las clases de Grid al main para que ocupe el resto del espacio */}
+        <main className='overlay-content col-span-12 row-span-5 @lg:col-span-9 @lg:row-span-6 flex flex-col justify-center p-4 @lg:p-20'>
+          <h1 className="text-[30px] @lg:text-[40px] font-mono mb-10 opacity-60 uppercase tracking-[0.5em] leading-tight">
+            {content.title}
+          </h1>
+          <p className="max-w-xl mb-10 text-white/70">
+            {content.description}
+          </p>
+
+          {content.media && (
+            <div className="media-container w-full max-w-2xl border border-white/10">
+              <img 
+                src={content.media.src} 
+                alt={content.title} 
+                className="w-full h-auto object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+              />
+            </div>
+          )}
         </main>
-        <button className='absolute top-10 right-10'>CLOSE</button>
+
+        <button 
+          onClick={onClose} 
+          id='RefCloseButton' 
+          className={`absolute top-6 right-6 @lg:top-10 @lg:right-10 p-2 border transition-colors duration-500
+            ${style.border} ${style.text} hover:bg-white hover:text-black`}
+        >
+          {content.buttonText}
+        </button>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import './index.css';
 import { ButtonOp } from './components/Buttons/ButtonOp';
+import { Overlay } from './components/Overlay/Overlay';
 
 export const App = () => {
   return (
@@ -14,18 +15,6 @@ export const App = () => {
         {/* 2. El Grid de botones */}
         <div className='flex flex-wrap justify-center gap-4 max-w-[600px]'>
           <ButtonOp id='01' lenguaje='js' onClick={() => {}} />
-          <ButtonOp id='02' lenguaje='ts' onClick={() => {}} />
-          <ButtonOp
-            id='03'
-            lenguaje='react'
-            image='/favicon.ico'
-            onClick={() => {}}
-          />
-          <ButtonOp id='04' lenguaje='css' onClick={() => {}} />
-          <ButtonOp id='05' lenguaje='html' onClick={() => {}} />
-          <ButtonOp id='06' lenguaje='tailwind' onClick={() => {}} />
-          <ButtonOp id='07' lenguaje='gsap' onClick={() => {}} />
-          <ButtonOp id='08' lenguaje='tanstack' onClick={() => {}} />
         </div>
       </main>
     </div>

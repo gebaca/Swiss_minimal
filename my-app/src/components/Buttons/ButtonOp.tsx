@@ -1,6 +1,6 @@
 import { baseButton } from '../../types';
 
-type LenguajeTipo =
+export type LenguajeTipo =
   | 'js'
   | 'ts'
   | 'react'
@@ -28,7 +28,7 @@ interface StyleConfig {
 
 ///TODO: AÑADIR IMAGENES A LOS QUE FALTAN
 
-const LENGUAJE_STYLES: Record<LenguajeTipo, StyleConfig> = {
+export const LENGUAJE_STYLES: Record<LenguajeTipo, StyleConfig> = {
   js: {
     border: 'border-yellow-400',
     textStyle:
