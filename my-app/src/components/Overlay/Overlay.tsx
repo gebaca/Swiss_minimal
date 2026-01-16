@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react';
 import { useRef } from 'react';
 import { LENGUAJE_STYLES, LenguajeTipo } from '../Buttons/ButtonOp';
+import { gsap } from 'gsap';
 
 export interface OverlayContent {
   id: string;
@@ -33,10 +34,47 @@ export const Overlay = ({
 }: OverlayProps) => {
   const RefBase = useRef<HTMLDivElement>(null);
   
+  // Guardamos el timeline en un ref para que persista
   const tl = useRef<gsap.core.Timeline>(null);
-  const { contextSafe } = useGSAP({ scope: 'overlay-actions' });
 
 
+  
+
+ useGSAP(
+  () => {
+    // AÑADE .timeline() AQUÍ
+    tl.current = gsap.timeline({ paused: true }) 
+      .fromTo(
+        '#overlay-container', 
+        { clipPath: 'inset(0 100% 0 0)' },
+        {
+          clipPath: 'inset(0 0% 0 0)',
+          // ... resto de tus propiedades
+          duration: 0.6,
+          ease: 'power4.inOut',
+        }
+      )
+      .from(
+        '.overlay-content', 
+        {
+          y: 50,
+          opacity: 0,
+          stagger: 0.1,
+          duration: 0.4,
+          ease: 'expo.out',
+        },
+        '-=0.2'
+      );
+      
+    // Disparar la animación según el estado
+    if (isOpen) {
+      tl.current.play();
+    } else {
+      tl.current.reverse();
+    }
+  },
+  { dependencies: [isOpen], scope: RefBase }
+);
   
   if (!isOpen || !content) return null;
   const style = LENGUAJE_STYLES[content.lenguaje];
@@ -48,7 +86,7 @@ export const Overlay = ({
       <div
         id='overlay-container'
         /* @container para que hijos reaccionen a este ancho */
-        className='@container relative w-full h-full max-w-7xl p-6 md:p-10 grid grid-cols-12 grid-rows-6 border border-white/10 bg-black'
+        className={`@container relative w-full h-full max-w-7xl p-6 md:p-10 grid grid-cols-12 grid-rows-6  border ${style.border} bg-black`}
       >
         <div
           id='overlay-actions'
@@ -68,10 +106,10 @@ export const Overlay = ({
 
         {/* Agregamos las clases de Grid al main para que ocupe el resto del espacio */}
         <main className='overlay-content col-span-12 row-span-5 @lg:col-span-9 @lg:row-span-6 flex flex-col justify-center p-4 @lg:p-20'>
-          <h1 className="text-[30px] @lg:text-[40px] font-mono mb-10 opacity-60 uppercase tracking-[0.5em] leading-tight">
+          <h1 className="text-[30px] @lg:text-[40px] font-mono mb-10 opacity-60 uppercase tracking-[0.5em] leading-tight text-white">
             {content.title}
           </h1>
-          <p className="max-w-xl mb-10 text-white/70">
+          <p className="max-w-xl mb-10 text-white/90">
             {content.description}
           </p>
 
@@ -80,7 +118,7 @@ export const Overlay = ({
               <img 
                 src={content.media.src} 
                 alt={content.title} 
-                className="w-full h-auto object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+                className="w-full h-auto object-cover" 
               />
             </div>
           )}
