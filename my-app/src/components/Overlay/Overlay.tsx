@@ -1,7 +1,6 @@
-import { useGSAP } from '@gsap/react';
-import { useRef } from 'react';
+import { useRef,useState,useEffect   } from 'react';
 import { LENGUAJE_STYLES, LenguajeTipo } from '../Buttons/ButtonOp';
-import { gsap } from 'gsap';
+import { useOverlayAnimation } from './OverlayHooks';
 
 export interface OverlayContent {
   id: string;
@@ -33,50 +32,22 @@ export const Overlay = ({
   onClose,
 }: OverlayProps) => {
   const RefBase = useRef<HTMLDivElement>(null);
-  
-  // Guardamos el timeline en un ref para que persista
-  const tl = useRef<gsap.core.Timeline>(null);
+  const [shouldRender, setShouldRender] = useState(isOpen);  
 
-
+  useEffect(() => {
+    if (isOpen) setShouldRender(true);
+  }, [isOpen]);
   
-
- useGSAP(
-  () => {
-    // AÑADE .timeline() AQUÍ
-    tl.current = gsap.timeline({ paused: true }) 
-      .fromTo(
-        '#overlay-container', 
-        { clipPath: 'inset(0 100% 0 0)' },
-        {
-          clipPath: 'inset(0 0% 0 0)',
-          // ... resto de tus propiedades
-          duration: 0.6,
-          ease: 'power4.inOut',
-        }
-      )
-      .from(
-        '.overlay-content', 
-        {
-          y: 50,
-          opacity: 0,
-          stagger: 0.1,
-          duration: 0.4,
-          ease: 'expo.out',
-        },
-        '-=0.2'
-      );
-      
-    // Disparar la animación según el estado
-    if (isOpen) {
-      tl.current.play();
-    } else {
-      tl.current.reverse();
-    }
-  },
-  { dependencies: [isOpen], scope: RefBase }
-);
-  
-  if (!isOpen || !content) return null;
+  useOverlayAnimation({
+    isOpen,
+    scope: RefBase,
+    containerSelector: '#overlay-container',
+    contentSelector: '.overlay-content',
+    // Cuando la animación de salida termine, desmontamos de verdad
+    onCompleteClose: () => setShouldRender(false),
+  });
+ 
+  if (!shouldRender || !content) return null;
   const style = LENGUAJE_STYLES[content.lenguaje];
   return (
     <div
